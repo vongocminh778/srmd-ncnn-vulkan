@@ -93,7 +93,7 @@ srmd-ncnn-vulkan.exe -i origin.jpg -o output.png -n 3 -s 4
 
 |Model|Target Size|Scale|Fps|CPU(%)|GPU(%)|
 |---|---|---|---|---|---|
-|srmd_x2.bin|640x480|2|7|90|100|
+|srmd_x2.bin|640x480|2|2|90|100|
 
 ## Original SRMD Project
 
