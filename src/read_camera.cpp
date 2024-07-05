@@ -62,17 +62,22 @@ int calculate_tilesize(int gpuid) {
 }
 
 int main(int argc, char** argv) {
-    const char* parampath = "../../models/models-srmd/srmd_x2.param";
-    const char* modelpath = "../../models/models-srmd/srmd_x2.bin";
+    if (argc != 6) {
+        std::cerr << "Usage: " << argv[0] << " <parampath> <modelpath> <prepadding> <noise> <scale>" << std::endl;
+        return -1;
+    }
+
+    const char* parampath = argv[1];
+    const char* modelpath = argv[2];
+    int prepadding = std::stoi(argv[3]);
+    int noise = std::stoi(argv[4]);
+    int scale = std::stoi(argv[5]);
 
     // Initialize SRMD
     ncnn::create_gpu_instance();
     int gpuid = ncnn::get_default_gpu_index();
     SRMD srmd(gpuid, 0);
 
-    int noise = 3;
-    int scale = 2;
-    int prepadding = 12; // Default padding for SRMD
     int tilesize = calculate_tilesize(gpuid);
 
     if (srmd.load(parampath, modelpath) != 0) {
@@ -109,18 +114,19 @@ int main(int argc, char** argv) {
         Mat frame_rgb;
         cvtColor(frame, frame_rgb, COLOR_BGR2RGB);
 
-        // Crop 256x256 region around the center
-        int cropSize = 256;
-        int centerX = frame_rgb.cols / 2;
-        int centerY = frame_rgb.rows / 2;
-        Rect cropRegion(centerX - cropSize / 2, centerY - cropSize / 2, cropSize, cropSize);
-        Mat croppedImage = frame_rgb(cropRegion);
-        resize(croppedImage, beforeImage, Size(croppedImage.cols * scale, croppedImage.rows * scale), INTER_LINEAR);
-        
-        Mat img_process = croppedImage.clone();
-        ncnn::Mat cv_inimage(croppedImage.cols, croppedImage.rows, img_process.data, (size_t)croppedImage.channels(), croppedImage.channels());
+        // // Crop 256x256 region around the center
+        // int cropSize = 256;
+        // int centerX = frame_rgb.cols / 2;
+        // int centerY = frame_rgb.rows / 2;
+        // Rect cropRegion(centerX - cropSize / 2, centerY - cropSize / 2, cropSize, cropSize);
+        // Mat croppedImage = frame_rgb(cropRegion);
 
-        ncnn::Mat ncnn_outimage(croppedImage.cols * scale, croppedImage.rows * scale, (size_t)croppedImage.channels(), croppedImage.channels());
+        resize(frame_rgb, beforeImage, Size(frame_rgb.cols * scale, frame_rgb.rows * scale), INTER_LINEAR);
+        
+        Mat img_process = frame_rgb.clone();
+        ncnn::Mat cv_inimage(frame_rgb.cols, frame_rgb.rows, img_process.data, (size_t)frame_rgb.channels(), frame_rgb.channels());
+
+        ncnn::Mat ncnn_outimage(frame_rgb.cols * scale, frame_rgb.rows * scale, (size_t)frame_rgb.channels(), frame_rgb.channels());
 
         int64 frame_tick = getTickCount();
 

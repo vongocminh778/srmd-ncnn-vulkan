@@ -86,6 +86,15 @@ srmd-ncnn-vulkan.exe -i origin.jpg -o output.png -n 3 -s 4
 
 ![srmd](images/2.png)
 
+### comparison
+```powershell
+./srmd-ncnn-vulkan ../../models/models-srmd/srmd_x2.param ../../models/models-srmd/srmd_x2.bin 12 3  2
+```
+
+|Model|Target Size|Scale|Fps|CPU(%)|GPU(%)|
+|---|---|---|---|---|---|
+|srmd_x2.bin|640x480|2|7|90|100|
+
 ## Original SRMD Project
 
 - https://github.com/cszn/SRMD
